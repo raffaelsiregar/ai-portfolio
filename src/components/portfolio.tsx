@@ -4,41 +4,26 @@ import { useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowDownToLine,
-  ArrowRight,
   ArrowUpRight,
   Check,
-  ChevronRight,
   Circle,
   Code2,
   Command,
-  FileText,
-  Folder,
   Github,
   Layers3,
   Linkedin,
-  Mail,
   Menu,
-  MoreHorizontal,
-  Play,
-  Plus,
-  Search,
-  Send,
   Sparkles,
   Workflow,
   X,
 } from "lucide-react";
-import {
-  profile,
-  projects,
-  type Category,
-  type Project,
-} from "@/lib/portfolio";
+import { profile, projects, type Status, type Project } from "@/lib/portfolio";
 
-const categories: Category[] = [
+const statuses: ("All projects" | Status)[] = [
   "All projects",
-  "AI automation",
-  "Web apps",
-  "Windows apps",
+  "Released",
+  "In development",
+  "Upcoming",
 ];
 
 function Mark({ small = false }: { small?: boolean }) {
@@ -96,10 +81,12 @@ function Sculpture() {
             <feGaussianBlur stdDeviation="5" />
           </filter>
         </defs>
-        <g className="torus-bloom" filter="url(#bloom)">
-          {lines}
+        <g className="torus-mesh">
+          <g className="torus-bloom" filter="url(#bloom)">
+            {lines}
+          </g>
+          <g>{lines}</g>
         </g>
-        <g>{lines}</g>
       </svg>
       <div className="float-token token-code">
         <Code2 size={25} strokeWidth={1.5} />
@@ -119,266 +106,35 @@ function Sculpture() {
   );
 }
 
-function TrafficLights() {
-  return (
-    <div className="traffic-lights">
-      <i />
-      <i />
-      <i />
-    </div>
-  );
-}
-
-function FlowPreview({ interactive = false }: { interactive?: boolean }) {
-  const [step, setStep] = useState(-1);
-  useEffect(() => {
-    if (step < 0 || step >= 3) return;
-    const timer = setTimeout(() => setStep((value) => value + 1), 650);
-    return () => clearTimeout(timer);
-  }, [step]);
-  return (
-    <div
-      className={`app-window flow-window ${interactive ? "interactive-preview" : ""}`}
-    >
-      <div className="window-bar">
-        <TrafficLights />
-        <span>flowstate</span>
-        <MoreHorizontal size={13} />
-      </div>
-      <div className="flow-body">
-        <div className="preview-heading">
-          <div>
-            <span className="mini-eyebrow">YOUR WORKFLOWS</span>
-            <strong>A little less manual.</strong>
-          </div>
-          <span className="mini-label">
-            <span /> Active
-          </span>
-        </div>
-        <div className="workflow-track">
-          <div className={`workflow-node ${step >= 0 ? "node-active" : ""}`}>
-            <Mail size={20} />
-            <span>New email</span>
-            <small>Trigger</small>
-          </div>
-          <div className={`flow-connector ${step >= 1 ? "connected" : ""}`}>
-            <span />
-            <ChevronRight size={11} />
-          </div>
-          <div
-            className={`workflow-node ai-node ${step >= 1 ? "node-active" : ""}`}
-          >
-            <Sparkles size={20} />
-            <span>AI magic</span>
-            <small>Summarize</small>
-          </div>
-          <div className={`flow-connector ${step >= 2 ? "connected" : ""}`}>
-            <span />
-            <ChevronRight size={11} />
-          </div>
-          <div className={`workflow-node ${step >= 2 ? "node-active" : ""}`}>
-            <Send size={19} />
-            <span>Send to you</span>
-            <small>Action</small>
-          </div>
-        </div>
-        <div className="flow-status">
-          <span>
-            <i />{" "}
-            {step === 3
-              ? "Workflow complete. All three steps finished."
-              : step >= 0
-                ? "Running your workflow…"
-                : "Your ideas, on autopilot."}
-          </span>
-          {interactive ? (
-            <button onClick={() => setStep(0)} disabled={step >= 0 && step < 3}>
-              <Play size={11} />
-              {step === 3 ? "Run again" : "Run flow"}
-            </button>
-          ) : (
-            <span className="preview-run">
-              <Play size={9} /> Run flow
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function OrbitPreview({ interactive = false }: { interactive?: boolean }) {
-  const [done, setDone] = useState([false, true, false]);
-  const tasks = [
-    "Explore the possibilities",
-    "Make something thoughtful",
-    "Bring it to life",
-  ];
-  return (
-    <div
-      className={`app-window orbit-window ${interactive ? "interactive-preview" : ""}`}
-    >
-      <div className="window-bar">
-        <TrafficLights />
-        <span>
-          <Circle size={9} /> orbit
-        </span>
-        <MoreHorizontal size={13} />
-      </div>
-      <div className="orbit-body">
-        <div className="orbit-sidebar">
-          <div className="orbit-logo">
-            <Circle size={16} />
-          </div>
-          <Layers3 size={12} />
-          <Folder size={12} />
-          <div className="sidebar-bottom">R</div>
-        </div>
-        <div className="orbit-content">
-          <div className="orbit-greeting">A little progress, every day.</div>
-          <div className="preview-heading">
-            <strong>
-              My workspace <span>✦</span>
-            </strong>
-            <span className="purple-plus">
-              <Plus size={11} />
-            </span>
-          </div>
-          <div className="orbit-tabs">
-            <span className="selected">Today</span>
-            <span>Upcoming</span>
-            <span>Someday</span>
-          </div>
-          <div className="task-list">
-            {tasks.map((task, i) =>
-              interactive ? (
-                <button
-                  key={task}
-                  onClick={() =>
-                    setDone((items) =>
-                      items.map((value, n) => (n === i ? !value : value)),
-                    )
-                  }
-                  className={`task ${done[i] ? "done" : ""}`}
-                  aria-pressed={done[i]}
-                >
-                  <span className="task-check">
-                    {done[i] && <Check size={9} />}
-                  </span>
-                  <span>{task}</span>
-                  <span className="task-dot" />
-                </button>
-              ) : (
-                <div key={task} className={`task ${done[i] ? "done" : ""}`}>
-                  <span className="task-check">
-                    {done[i] && <Check size={9} />}
-                  </span>
-                  <span>{task}</span>
-                  <span className="task-dot" />
-                </div>
-              ),
-            )}
-          </div>
-          <div className="orbit-bottom">
-            {done.filter(Boolean).length} of 3 little wins{" "}
-            <div>
-              <span
-                style={{ width: `${(done.filter(Boolean).length / 3) * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ClarityPreview({ interactive = false }: { interactive?: boolean }) {
-  const [query, setQuery] = useState("");
-  const files = [
-    { name: "Projects", count: "Your next big thing", icon: "folder" },
-    { name: "Inspiration", count: "A place for the sparks", icon: "folder" },
-    { name: "Notes.md", count: "Thoughts, collected", icon: "file" },
-  ];
-  return (
-    <div
-      className={`app-window clarity-window ${interactive ? "interactive-preview" : ""}`}
-    >
-      <div className="window-bar">
-        <span className="clarity-title">
-          <span className="clarity-symbol">✧</span> Clarity
-        </span>
-        <span className="windows-controls">
-          − <span>□</span> ×
-        </span>
-      </div>
-      <div className="clarity-body">
-        <div className="preview-heading">
-          <div>
-            <span className="mini-eyebrow">A CLEARER HEADSPACE</span>
-            <strong>Find your focus.</strong>
-          </div>
-          <span className="clarity-symbol">✧</span>
-        </div>
-        <div className="mini-search">
-          <Search size={12} />
-          {interactive ? (
-            <input
-              aria-label="Search demo files"
-              placeholder="Find something…"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          ) : (
-            <span>Find something…</span>
-          )}
-          <span className="search-shortcut">Ctrl K</span>
-        </div>
-        <div className="file-list">
-          {files
-            .filter((file) =>
-              file.name.toLowerCase().includes(query.toLowerCase()),
-            )
-            .map((file) => (
-              <div className="file-row" key={file.name}>
-                <span className={`file-icon ${file.icon}`}>
-                  {file.icon === "folder" ? (
-                    <Folder size={17} fill="currentColor" />
-                  ) : (
-                    <FileText size={17} />
-                  )}
-                </span>
-                <div>
-                  <strong>{file.name}</strong>
-                  <span>{file.count}</span>
-                </div>
-                <ChevronRight size={11} />
-              </div>
-            ))}
-          {files.filter((file) =>
-            file.name.toLowerCase().includes(query.toLowerCase()),
-          ).length === 0 && (
-            <p className="no-files">No files found. Try “Projects”.</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Preview({
-  id,
-  interactive = false,
+  project,
+  detail = false,
 }: {
-  id: Project["id"];
-  interactive?: boolean;
+  project: Project;
+  detail?: boolean;
 }) {
-  return id === "flow" ? (
-    <FlowPreview interactive={interactive} />
-  ) : id === "orbit" ? (
-    <OrbitPreview interactive={interactive} />
-  ) : (
-    <ClarityPreview interactive={interactive} />
+  if (project.image) {
+    return (
+      <img
+        className={`project-screenshot ${detail ? "full-screenshot" : ""}`}
+        src={project.image}
+        alt={`${project.name} — actual project interface`}
+        width={1280}
+        height={800}
+        loading="lazy"
+      />
+    );
+  }
+  return (
+    <div className="upcoming-preview">
+      <span className="upcoming-icon">
+        <Code2 size={29} strokeWidth={1.2} />
+      </span>
+      <strong>{project.name}</strong>
+      <span>On the horizon.</span>
+      <div className="upcoming-line" />
+      <small>AN IDEA TAKING SHAPE</small>
+    </div>
   );
 }
 
@@ -508,7 +264,8 @@ function Contact({ onClose }: { onClose: () => void }) {
 }
 
 export default function Portfolio() {
-  const [category, setCategory] = useState<Category>("All projects");
+  const [status, setStatus] =
+    useState<(typeof statuses)[number]>("All projects");
   const [project, setProject] = useState<Project | null>(null);
   const [contact, setContact] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -654,21 +411,22 @@ export default function Portfolio() {
             </div>
             <p>
               Small sparks. Thoughtful builds.
-              <br />A few possibilities brought to life.
+              <br />
+              Released, in progress, and on the horizon.
             </p>
           </div>
           <div className="work-toolbar">
             <div
               className="filter-list"
               role="group"
-              aria-label="Filter projects"
+              aria-label="Filter projects by status"
             >
-              {categories.map((item) => (
+              {statuses.map((item) => (
                 <button
                   key={item}
-                  aria-pressed={category === item}
-                  className={category === item ? "selected" : ""}
-                  onClick={() => setCategory(item)}
+                  aria-pressed={status === item}
+                  className={status === item ? "selected" : ""}
+                  onClick={() => setStatus(item)}
                 >
                   {item}
                   {item === "All projects" && (
@@ -678,34 +436,37 @@ export default function Portfolio() {
               ))}
             </div>
             <span className="concept-note">
-              <Circle size={8} /> Concept collection
+              <Circle size={8} /> 5 released · 2 in development · 3 upcoming
             </span>
           </div>
           <div className="project-grid" aria-live="polite">
             {projects
               .filter(
-                (item) =>
-                  category === "All projects" || item.category === category,
+                (item) => status === "All projects" || item.status === status,
               )
               .map((item) => (
                 <button
                   key={item.id}
                   className={`project-card project-${item.accent}`}
                   onClick={() => setProject(item)}
-                  aria-label={`Explore ${item.name}, a ${item.category.toLowerCase()} concept`}
+                  aria-label={`Explore ${item.name} — ${item.status}`}
                 >
                   <div className="project-visual">
                     <div className="project-visual-top">
                       <span>{item.category}</span>
                       <span className="project-number">
-                        0{projects.indexOf(item) + 1}
+                        {String(projects.indexOf(item) + 1).padStart(2, "0")}
                       </span>
                     </div>
                     <div className="preview-stage">
-                      <Preview id={item.id} />
+                      <Preview project={item} />
                     </div>
                     <div className="project-visual-bottom">
-                      <span>CONCEPT PROJECT</span>
+                      <span
+                        className={`project-status status-${item.status.toLowerCase().replaceAll(" ", "-")}`}
+                      >
+                        {item.status}
+                      </span>
                       <span>✦</span>
                     </div>
                   </div>
@@ -737,11 +498,22 @@ export default function Portfolio() {
             <span className="about-card-label">
               THE PERSON BEHIND THE PIXELS
             </span>
-            <div className="monogram">
-              rn<span>.</span>
-            </div>
+            <img
+              className="profile-photo"
+              loading="lazy"
+              src={profile.photo}
+              alt={profile.name}
+              width={800}
+              height={800}
+            />
             <div className="profile-window">
-              <span className="profile-avatar">R</span>
+              <img
+                className="profile-avatar"
+                src={profile.photo}
+                alt=""
+                width={34}
+                height={34}
+              />
               <div>
                 <strong>{profile.name}</strong>
                 <span>{profile.role}</span>
@@ -886,11 +658,11 @@ export default function Portfolio() {
       {project && (
         <Modal
           onClose={() => setProject(null)}
-          label={`${project.name} concept project`}
+          label={`${project.name} — ${project.status}`}
         >
           <div className={`project-detail project-${project.accent}`}>
             <span className="eyebrow">
-              {project.category} / CONCEPT PROJECT
+              {project.category} / {project.status}
             </span>
             <h2>
               {project.name}
@@ -898,18 +670,29 @@ export default function Portfolio() {
             </h2>
             <p>{project.detail}</p>
             <div className="detail-preview">
-              <Preview id={project.id} interactive />
+              <Preview project={project} detail />
             </div>
-            <div className="demo-caption">
-              <Sparkles size={13} /> Interactive concept —{" "}
-              {project.id === "flow"
-                ? "run the workflow to see it in action"
-                : project.id === "orbit"
-                  ? "click a task to mark it complete"
-                  : "type in the search to find a file"}
-              .
-            </div>
-            <h3>Built around the little things.</h3>
+            {project.captureNote && (
+              <p className="demo-caption">
+                <Sparkles size={13} />
+                {project.captureNote}
+              </p>
+            )}
+            {project.url && (
+              <a
+                className="button button-primary project-live-link"
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Visit live project <ArrowUpRight size={16} />
+              </a>
+            )}
+            <h3>
+              {project.status === "Upcoming"
+                ? "The idea"
+                : "Inside the project"}
+            </h3>
             <ul>
               {project.features.map((feature) => (
                 <li key={feature}>
@@ -923,10 +706,13 @@ export default function Portfolio() {
                 <span key={tag}>{tag}</span>
               ))}
             </div>
-            <p className="concept-disclaimer">
-              This is an illustrative project concept, not a released product.
-              Replace it with a real project in the portfolio configuration.
-            </p>
+            {project.status !== "Released" && (
+              <p className="concept-disclaimer">
+                {project.status === "In development"
+                  ? "Still in development. Features and interface may change before release."
+                  : "Upcoming project. No released app or working demo yet."}
+              </p>
+            )}
           </div>
         </Modal>
       )}
