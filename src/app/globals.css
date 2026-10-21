@@ -2435,3 +2435,120 @@ h2 {
     min-height: 380px;
   }
 }
+
+/* Reveals are enabled only after the observer is ready; content stays readable without JavaScript. */
+.scroll-reveal {
+  transition:
+    opacity 800ms ease var(--reveal-delay, 0ms),
+    transform 950ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    filter 800ms ease var(--reveal-delay, 0ms);
+}
+.scroll-reveal[data-reveal="pending"] {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  filter: blur(5px);
+}
+.scroll-reveal[data-reveal="visible"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.project-card.scroll-reveal {
+  animation: none;
+}
+.scroll-reveal:focus-within {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.modal[open] {
+  animation: modal-pop 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.modal[open]::backdrop {
+  animation: backdrop-appear 350ms ease both;
+}
+.modal[open] .project-detail > :not(.eyebrow) {
+  animation: popup-content 550ms 100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.modal[open] .project-detail .detail-preview {
+  animation-delay: 160ms;
+}
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes backdrop-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes popup-content {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.contact-methods {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.contact-methods a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 15px;
+  border: 1px solid #ffffff12;
+  border-radius: 8px;
+  background: #ffffff02;
+  color: #b8b7ae;
+  font-size: 10px;
+  transition:
+    border-color 200ms,
+    background 200ms,
+    color 200ms;
+}
+.contact-methods a:hover {
+  border-color: #ff87584d;
+  background: #ff875807;
+  color: #f3f0eb;
+}
+@media (max-width: 560px) {
+  .contact-methods {
+    gap: 10px;
+    margin-top: 23px;
+  }
+  .contact-methods a {
+    font-size: 9px;
+    padding: 11px 12px;
+  }
+  .footer-links {
+    gap: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal[data-reveal] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .modal[open]::backdrop {
+    animation: none !important;
+  }
+}

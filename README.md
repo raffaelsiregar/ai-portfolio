@@ -34,3 +34,5 @@ npm run format
 ```
 
 The site includes project filters, native accessible dialogs with keyboard focus management, reduced-motion support, responsive layouts, metadata, and an SVG favicon.
+
+Sections and project cards reveal once as they enter the viewport. Project dialogs use a scale-and-fade entrance. Both respect reduced-motion preferences. WhatsApp, LinkedIn, and email links appear in the contact section and footer; the contact form opens a draft addressed to the configured email.

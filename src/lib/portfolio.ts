@@ -4,9 +4,10 @@ export const profile = {
   shortName: "Raffael",
   role: "Vibe coder & digital builder",
   photo: "/profile.png",
-  email: "",
+  email: "raffaelnathanielsiregar@gmail.com",
+  whatsapp: "https://wa.me/6287884440256",
   github: "",
-  linkedin: "",
+  linkedin: "https://www.linkedin.com/in/raffaelnathanielsiregar/",
   tagline: "Turning curiosity into things you can actually use.",
 };
 

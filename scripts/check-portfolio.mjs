@@ -28,4 +28,7 @@ for (const project of projects) {
   if (project.url) assert.equal(new URL(project.url).protocol, "https:");
 }
 assert.ok(existsSync(`public${profile.photo}`));
+assert.equal(profile.email, "raffaelnathanielsiregar@gmail.com");
+assert.equal(profile.whatsapp, "https://wa.me/6287884440256");
+assert.equal(profile.linkedin, "https://www.linkedin.com/in/raffaelnathanielsiregar/");
 console.log("Portfolio verified: 10 projects, 5 released, 2 in development, 3 upcoming, 7 screenshots, and profile photo.");

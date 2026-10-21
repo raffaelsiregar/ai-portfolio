@@ -12,7 +12,9 @@ import {
   Github,
   Layers3,
   Linkedin,
+  Mail,
   Menu,
+  MessageCircle,
   Sparkles,
   Workflow,
   X,
@@ -285,6 +287,38 @@ export default function Portfolio() {
       .forEach((section) => observer.observe(section));
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (
+      !window.IntersectionObserver ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          (entry.target as HTMLElement).dataset.reveal = "visible";
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -32px 0px" },
+    );
+
+    document
+      .querySelectorAll<HTMLElement>(
+        ".hero-content > *, .toolkit, .section-title-row, .work-toolbar, .project-card, .work-footnote, .about-visual, .about-copy, .approach-intro, .process-step, .contact-section > :not(.contact-glow), .footer",
+      )
+      .forEach((element, index) => {
+        if (element.dataset.reveal === "visible") return;
+        element.classList.add("scroll-reveal");
+        element.style.setProperty("--reveal-delay", `${(index % 3) * 75}ms`);
+        element.dataset.reveal = "pending";
+        observer.observe(element);
+      });
+    return () => observer.disconnect();
+  }, [status]);
 
   return (
     <>
@@ -615,6 +649,31 @@ export default function Portfolio() {
           >
             Let’s build something <ArrowUpRight size={17} />
           </button>
+          <div className="contact-methods" aria-label="Contact Raffael">
+            <a
+              href={profile.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle size={17} />
+              <span>WhatsApp</span>
+              <ArrowUpRight size={12} />
+            </a>
+            <a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Linkedin size={17} />
+              <span>LinkedIn</span>
+              <ArrowUpRight size={12} />
+            </a>
+            <a href={`mailto:${profile.email}`}>
+              <Mail size={17} />
+              <span>{profile.email}</span>
+              <ArrowUpRight size={12} />
+            </a>
+          </div>
           <div className="contact-signature">
             A human idea. A little AI. A world of possibility.
           </div>
@@ -629,6 +688,17 @@ export default function Portfolio() {
           Thoughtfully built. Endlessly curious.
         </span>
         <div className="footer-links">
+          <a
+            href={profile.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+          >
+            <MessageCircle size={17} />
+          </a>
+          <a href={`mailto:${profile.email}`} aria-label="Email Raffael">
+            <Mail size={17} />
+          </a>
           {profile.github && (
             <a
               href={profile.github}
