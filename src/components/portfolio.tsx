@@ -655,7 +655,7 @@ export default function Portfolio() {
           >
             {visibleProjects.map((item) => (
               <button
-                key={item.id}
+                key={`${status}:${item.id}`}
                 className={`project-card project-${item.accent}`}
                 onClick={() => setProject(item)}
                 aria-label={`Explore ${item.name} — ${item.status}`}
