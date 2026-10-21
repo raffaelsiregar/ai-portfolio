@@ -23,6 +23,11 @@ import {
   X,
 } from "lucide-react";
 import { profile, projects, type Status, type Project } from "@/lib/portfolio";
+import {
+  initialTorusRotation,
+  projectTorus,
+  type TorusRotation,
+} from "@/lib/torus";
 
 const statuses: ("All projects" | Status)[] = [
   "All projects",
@@ -45,59 +50,97 @@ function Mark({ small = false }: { small?: boolean }) {
 
 function Sculpture() {
   const sculptureRef = useRef<HTMLDivElement>(null);
-  const position = useRef({ x: 0, y: 0 });
+  const meshRef = useRef<SVGGElement>(null);
+  const rotation = useRef<TorusRotation>({ ...initialTorusRotation });
+  const manipulated = useRef(false);
+  const requestRender = useRef<(() => void) | null>(null);
   const drag = useRef<{
     pointerId: number;
     startX: number;
     startY: number;
-    x: number;
-    y: number;
+    pitch: number;
+    yaw: number;
   } | null>(null);
 
-  function moveSculpture(element: HTMLDivElement, x: number, y: number) {
-    position.current = {
-      x: Math.max(
-        -Math.min(80, element.clientWidth * 0.15),
-        Math.min(Math.min(80, element.clientWidth * 0.15), x),
-      ),
-      y: Math.max(-65, Math.min(65, y)),
+  useEffect(() => {
+    const element = sculptureRef.current;
+    const mesh = meshRef.current;
+    if (!element || !mesh) return;
+    const lines = Array.from(mesh.children);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    let lastTime = 0;
+    let visible = true;
+
+    function draw(time: number) {
+      frame = 0;
+      if (
+        !manipulated.current &&
+        !reducedMotion.matches &&
+        visible &&
+        !document.hidden
+      ) {
+        rotation.current.yaw +=
+          Math.min(time - (lastTime || time), 50) * 0.00012;
+      }
+      lastTime = time;
+      projectTorus(rotation.current).forEach((points, index) => {
+        lines[index].setAttribute("points", points);
+      });
+      if (
+        !manipulated.current &&
+        !reducedMotion.matches &&
+        visible &&
+        !document.hidden
+      ) {
+        frame = requestAnimationFrame(draw);
+      }
+    }
+
+    function wake() {
+      lastTime = 0;
+      if (!frame) frame = requestAnimationFrame(draw);
+    }
+    requestRender.current = wake;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      wake();
+    });
+    observer.observe(element);
+    reducedMotion.addEventListener("change", wake);
+    document.addEventListener("visibilitychange", wake);
+    wake();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      reducedMotion.removeEventListener("change", wake);
+      document.removeEventListener("visibilitychange", wake);
+      requestRender.current = null;
     };
-    element.style.setProperty("--drag-x", `${position.current.x}px`);
-    element.style.setProperty("--drag-y", `${position.current.y}px`);
+  }, []);
+
+  function rotateTorus(pitch: number, yaw: number) {
+    manipulated.current = true;
+    rotation.current = { pitch, yaw };
+    requestRender.current?.();
   }
 
   function resetSculpture() {
-    if (!sculptureRef.current) return;
-    moveSculpture(sculptureRef.current, 0, 0);
-    sculptureRef.current.style.setProperty("--pointer-x", "0deg");
-    sculptureRef.current.style.setProperty("--pointer-y", "0deg");
+    rotation.current = { ...initialTorusRotation };
+    manipulated.current = false;
+    requestRender.current?.();
   }
 
   function followPointer(event: React.PointerEvent<HTMLDivElement>) {
-    if (drag.current?.pointerId === event.pointerId) {
-      moveSculpture(
-        event.currentTarget,
-        drag.current.x + event.clientX - drag.current.startX,
-        drag.current.y + event.clientY - drag.current.startY,
-      );
-      return;
-    }
-    if (
-      event.pointerType !== "mouse" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(
-      -0.5,
-      Math.min(0.5, (event.clientX - bounds.left) / bounds.width - 0.5),
+    if (drag.current?.pointerId !== event.pointerId) return;
+    // A full stage-width drag turns the model through 180 degrees at any size.
+    const radiansPerPixel = Math.PI / event.currentTarget.clientWidth;
+    rotateTorus(
+      drag.current.pitch -
+        (event.clientY - drag.current.startY) * radiansPerPixel,
+      drag.current.yaw +
+        (event.clientX - drag.current.startX) * radiansPerPixel,
     );
-    const y = Math.max(
-      -0.5,
-      Math.min(0.5, (event.clientY - bounds.top) / bounds.height - 0.5),
-    );
-    event.currentTarget.style.setProperty("--pointer-x", `${x * 10}deg`);
-    event.currentTarget.style.setProperty("--pointer-y", `${y * -10}deg`);
   }
 
   function endDrag(event: React.PointerEvent<HTMLDivElement>) {
@@ -108,31 +151,16 @@ function Sculpture() {
       event.currentTarget.releasePointerCapture(event.pointerId);
   }
 
-  const lines = Array.from({ length: 74 }, (_, index) => {
-    const u = (index / 74) * Math.PI * 2;
-    const points = Array.from({ length: 65 }, (_, j) => {
-      const v = (j / 64) * Math.PI * 2;
-      const x = (130 + 48 * Math.cos(v)) * Math.cos(u);
-      const y = (130 + 48 * Math.cos(v)) * Math.sin(u);
-      const z = 48 * Math.sin(v);
-      const ry = y * Math.cos(0.85) - z * Math.sin(0.85);
-      const rz = y * Math.sin(0.85) + z * Math.cos(0.85);
-      const rx = x * Math.cos(-0.56) - ry * Math.sin(-0.56);
-      const yy = x * Math.sin(-0.56) + ry * Math.cos(-0.56);
-      const perspective = 700 / (700 - rz);
-      return `${(250 + rx * perspective).toFixed(2)},${(250 + yy * perspective).toFixed(2)}`;
-    });
-    return (
-      <polyline
-        key={index}
-        points={points.join(" ")}
-        fill="none"
-        stroke="url(#copper)"
-        strokeWidth={1.05}
-        opacity={0.45 + Math.sin(u) * 0.25}
-      />
-    );
-  });
+  const lines = projectTorus(initialTorusRotation).map((points, index) => (
+    <polyline
+      key={index}
+      points={points}
+      fill="none"
+      stroke="url(#copper)"
+      strokeWidth={1.05}
+      opacity={0.45 + Math.sin((index / 74) * Math.PI * 2) * 0.25}
+    />
+  ));
   return (
     <div
       ref={sculptureRef}
@@ -153,8 +181,9 @@ function Sculpture() {
           pointerId: event.pointerId,
           startX: event.clientX,
           startY: event.clientY,
-          ...position.current,
+          ...rotation.current,
         };
+        manipulated.current = true;
         event.currentTarget.setPointerCapture(event.pointerId);
         event.currentTarget.dataset.dragging = "true";
       }}
@@ -166,27 +195,21 @@ function Sculpture() {
       onKeyDown={(event) => {
         if (event.target !== event.currentTarget) return;
         const steps: Record<string, [number, number]> = {
-          ArrowLeft: [-12, 0],
-          ArrowRight: [12, 0],
-          ArrowUp: [0, -12],
-          ArrowDown: [0, 12],
+          ArrowLeft: [0, -Math.PI / 18],
+          ArrowRight: [0, Math.PI / 18],
+          ArrowUp: [Math.PI / 18, 0],
+          ArrowDown: [-Math.PI / 18, 0],
         };
         if (steps[event.key]) {
           event.preventDefault();
-          moveSculpture(
-            event.currentTarget,
-            position.current.x + steps[event.key][0],
-            position.current.y + steps[event.key][1],
+          rotateTorus(
+            rotation.current.pitch + steps[event.key][0],
+            rotation.current.yaw + steps[event.key][1],
           );
         } else if (event.key === "Home" || event.key === "Escape") {
           event.preventDefault();
           resetSculpture();
         }
-      }}
-      onPointerLeave={(event) => {
-        if (drag.current) return;
-        event.currentTarget.style.setProperty("--pointer-x", "0deg");
-        event.currentTarget.style.setProperty("--pointer-y", "0deg");
       }}
     >
       <div className="sculpture-depth" aria-hidden="true">
@@ -207,9 +230,11 @@ function Sculpture() {
           </defs>
           <g className="torus-mesh">
             <g className="torus-bloom" filter="url(#bloom)">
+              <use href="#torus-wireframe" />
+            </g>
+            <g id="torus-wireframe" ref={meshRef}>
               {lines}
             </g>
-            <g>{lines}</g>
           </g>
         </svg>
         <div className="float-token token-code">
@@ -229,15 +254,15 @@ function Sculpture() {
       </div>
       <div className="sculpture-controls">
         <span id="sculpture-help">
-          Drag to play
+          Drag to rotate in 3D
           <span className="sr-only">
-            . Use arrow keys to move, Home or Escape to reset.
+            . Use arrow keys to rotate, Home or Escape to reset.
           </span>
         </span>
         <button
           type="button"
           onClick={resetSculpture}
-          aria-label="Reset sculpture position"
+          aria-label="Reset sculpture rotation"
         >
           Reset
         </button>
