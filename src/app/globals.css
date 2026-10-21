@@ -2558,7 +2558,8 @@ h2 {
   position: absolute;
   inset: 0;
   isolation: isolate;
-  transform: perspective(900px) rotateX(var(--pointer-y, 0deg))
+  transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0)
+    perspective(900px) rotateX(var(--pointer-y, 0deg))
     rotateY(var(--pointer-x, 0deg));
   transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -2577,14 +2578,14 @@ h2 {
   background-position: 100% 0;
   background-clip: text;
   -webkit-background-clip: text;
-  animation: idea-highlight 9s ease-in-out infinite;
+  animation: idea-highlight 6s ease-in-out infinite;
 }
 @keyframes idea-highlight {
   0%,
-  62% {
+  10% {
     background-position: 100% 0;
   }
-  83%,
+  90%,
   100% {
     background-position: 0% 0;
   }
@@ -2726,7 +2727,7 @@ h2 {
 }
 @media (prefers-reduced-motion: reduce) {
   .sculpture-depth {
-    transform: none;
+    transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0);
   }
   .hero-real {
     animation: none;
@@ -2751,5 +2752,221 @@ h2 {
   }
   .profile-photo {
     scale: none !important;
+  }
+}
+
+.sculpture {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  outline-offset: -12px;
+}
+.sculpture-depth {
+  pointer-events: none;
+}
+.sculpture[data-dragging="true"] {
+  cursor: grabbing;
+}
+.sculpture[data-dragging="true"] .sculpture-depth {
+  transition: none;
+}
+.sculpture[data-dragging="true"] .torus-mesh {
+  animation-play-state: paused;
+}
+.sculpture-controls {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 9px;
+  color: #999081;
+  white-space: nowrap;
+  cursor: default;
+}
+.sculpture-controls button {
+  border: 1px solid #ffffff1b;
+  background: #ffffff04;
+  border-radius: 5px;
+  padding: 5px 8px;
+  color: #bcb1a0;
+  font-size: 8px;
+}
+.sculpture-controls button:hover {
+  background: #ffffff0c;
+  color: #fff0dc;
+}
+.project-meta {
+  display: flex;
+  margin-bottom: 12px;
+}
+.project-meta .project-status {
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.45px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 6px 9px;
+  gap: 6px;
+}
+.project-meta .status-released {
+  color: #c2e5b6;
+  background: #213027;
+  border-color: #456146;
+}
+.project-meta .status-in-development {
+  color: #ffdaa0;
+  background: #352c20;
+  border-color: #78603c;
+}
+.project-meta .status-upcoming {
+  color: #ddd0fb;
+  background: #2c2839;
+  border-color: #605574;
+}
+.project-expand {
+  display: flex;
+  justify-content: center;
+  padding-top: 35px;
+}
+.more-projects {
+  background: #22211e;
+  color: #eee8de;
+  border: 1px solid #ffffff19;
+  gap: 13px;
+  min-width: 220px;
+}
+.more-projects > span {
+  color: #a8a294;
+  font-size: 9px;
+  font-weight: 400;
+}
+.more-projects:hover {
+  border-color: #ffb58c55;
+  background: #29251f;
+}
+.more-projects svg {
+  transition: rotate 400ms ease;
+}
+.more-projects[aria-expanded="true"] svg {
+  rotate: 180deg;
+}
+.services {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.services .approach-intro {
+  grid-column: 1 / -1;
+  margin-bottom: 9px;
+}
+.services .approach-intro h2 {
+  font-size: 33px;
+}
+.service-card {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid #ffffff12;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ffffff04, #ffffff01);
+  transition:
+    border-color 350ms ease,
+    background 350ms ease;
+}
+.service-card:hover {
+  border-color: #af79594d;
+  background: #ffb78f04;
+}
+.service-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #b69e83;
+}
+.service-card-top span {
+  font: 8px monospace;
+  letter-spacing: 1px;
+}
+.service-card h3 {
+  font-size: 18px;
+  line-height: 1.4;
+  margin-top: 24px;
+}
+.service-card p {
+  font-size: 11px;
+  line-height: 1.9;
+  max-width: none;
+}
+.service-card .text-link {
+  font-size: 10px;
+  color: #c6b299;
+  margin-top: auto;
+  padding-top: 22px;
+}
+.contact-section h2 {
+  font-weight: 700;
+}
+.contact-section h2 > span {
+  color: transparent;
+  background: linear-gradient(
+    110deg,
+    #c4b6a4 20%,
+    #fff1db 45%,
+    #ffc79e 55%,
+    #c4b6a4 80%
+  );
+  background-size: 230% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: contact-shimmer 7s ease-in-out infinite alternate;
+}
+@keyframes contact-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+@media (max-width: 720px) {
+  .services {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .services .approach-intro h2 {
+    font-size: 29px;
+  }
+  .service-card {
+    padding: 24px;
+  }
+  .service-card h3 {
+    font-size: 21px;
+    margin-top: 20px;
+  }
+  .service-card p {
+    font-size: 12px;
+  }
+}
+@media (pointer: coarse) {
+  .sculpture {
+    touch-action: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-section h2 > span {
+    animation: none;
+    background: none;
+    color: #d9c6af;
+  }
+}
+@media (forced-colors: active) {
+  .hero-real,
+  .contact-section h2 > span {
+    background: none;
+    color: CanvasText;
   }
 }

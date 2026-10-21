@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowDownToLine,
   ArrowUpRight,
+  AppWindow,
   Check,
+  ChevronDown,
   Circle,
   Code2,
   Command,
   Github,
+  Globe2,
   Layers3,
   Linkedin,
   Mail,
@@ -41,7 +44,44 @@ function Mark({ small = false }: { small?: boolean }) {
 }
 
 function Sculpture() {
+  const sculptureRef = useRef<HTMLDivElement>(null);
+  const position = useRef({ x: 0, y: 0 });
+  const drag = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  function moveSculpture(element: HTMLDivElement, x: number, y: number) {
+    position.current = {
+      x: Math.max(
+        -Math.min(80, element.clientWidth * 0.15),
+        Math.min(Math.min(80, element.clientWidth * 0.15), x),
+      ),
+      y: Math.max(-65, Math.min(65, y)),
+    };
+    element.style.setProperty("--drag-x", `${position.current.x}px`);
+    element.style.setProperty("--drag-y", `${position.current.y}px`);
+  }
+
+  function resetSculpture() {
+    if (!sculptureRef.current) return;
+    moveSculpture(sculptureRef.current, 0, 0);
+    sculptureRef.current.style.setProperty("--pointer-x", "0deg");
+    sculptureRef.current.style.setProperty("--pointer-y", "0deg");
+  }
+
   function followPointer(event: React.PointerEvent<HTMLDivElement>) {
+    if (drag.current?.pointerId === event.pointerId) {
+      moveSculpture(
+        event.currentTarget,
+        drag.current.x + event.clientX - drag.current.startX,
+        drag.current.y + event.clientY - drag.current.startY,
+      );
+      return;
+    }
     if (
       event.pointerType !== "mouse" ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -58,6 +98,14 @@ function Sculpture() {
     );
     event.currentTarget.style.setProperty("--pointer-x", `${x * 10}deg`);
     event.currentTarget.style.setProperty("--pointer-y", `${y * -10}deg`);
+  }
+
+  function endDrag(event: React.PointerEvent<HTMLDivElement>) {
+    if (drag.current?.pointerId !== event.pointerId) return;
+    drag.current = null;
+    delete event.currentTarget.dataset.dragging;
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
   }
 
   const lines = Array.from({ length: 74 }, (_, index) => {
@@ -87,15 +135,61 @@ function Sculpture() {
   });
   return (
     <div
+      ref={sculptureRef}
       className="sculpture"
-      aria-hidden="true"
+      role="group"
+      aria-label="Interactive light sculpture"
+      aria-describedby="sculpture-help"
+      tabIndex={0}
+      onPointerDown={(event) => {
+        if (
+          !event.isPrimary ||
+          event.button !== 0 ||
+          (event.target as Element).closest("button")
+        )
+          return;
+        event.currentTarget.focus({ preventScroll: true });
+        drag.current = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          ...position.current,
+        };
+        event.currentTarget.setPointerCapture(event.pointerId);
+        event.currentTarget.dataset.dragging = "true";
+      }}
       onPointerMove={followPointer}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onLostPointerCapture={endDrag}
+      onDoubleClick={resetSculpture}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        const steps: Record<string, [number, number]> = {
+          ArrowLeft: [-12, 0],
+          ArrowRight: [12, 0],
+          ArrowUp: [0, -12],
+          ArrowDown: [0, 12],
+        };
+        if (steps[event.key]) {
+          event.preventDefault();
+          moveSculpture(
+            event.currentTarget,
+            position.current.x + steps[event.key][0],
+            position.current.y + steps[event.key][1],
+          );
+        } else if (event.key === "Home" || event.key === "Escape") {
+          event.preventDefault();
+          resetSculpture();
+        }
+      }}
       onPointerLeave={(event) => {
+        if (drag.current) return;
         event.currentTarget.style.setProperty("--pointer-x", "0deg");
         event.currentTarget.style.setProperty("--pointer-y", "0deg");
       }}
     >
-      <div className="sculpture-depth">
+      <div className="sculpture-depth" aria-hidden="true">
         <div className="sculpture-glow" />
         <div className="orbital orbit-one" />
         <div className="orbital orbit-two" />
@@ -132,6 +226,21 @@ function Sculpture() {
         <span className="coordinate coordinate-two">∞ POSSIBILITIES</span>
         <span className="spark spark-one" />
         <span className="spark spark-two" />
+      </div>
+      <div className="sculpture-controls">
+        <span id="sculpture-help">
+          Drag to play
+          <span className="sr-only">
+            . Use arrow keys to move, Home or Escape to reset.
+          </span>
+        </span>
+        <button
+          type="button"
+          onClick={resetSculpture}
+          aria-label="Reset sculpture position"
+        >
+          Reset
+        </button>
       </div>
     </div>
   );
@@ -301,6 +410,38 @@ export default function Portfolio() {
   const [contact, setContact] = useState(false);
   const [menu, setMenu] = useState(false);
   const [active, setActive] = useState("home");
+  const [expanded, setExpanded] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const previousGridHeight = useRef<number | null>(null);
+  const visibleProjects =
+    status === "All projects"
+      ? projects.slice(0, expanded ? projects.length : 6)
+      : projects.filter((item) => item.status === status);
+
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    const previous = previousGridHeight.current;
+    previousGridHeight.current = null;
+    if (
+      !grid ||
+      previous === null ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const animation = grid.animate(
+      [
+        { height: `${previous}px` },
+        { height: `${grid.getBoundingClientRect().height}px` },
+      ],
+      { duration: 650, easing: "cubic-bezier(.22, 1, .36, 1)" },
+    );
+    grid.style.overflow = "clip";
+    animation.onfinish = () => grid.style.removeProperty("overflow");
+    return () => {
+      animation.cancel();
+      grid.style.removeProperty("overflow");
+    };
+  }, [expanded, status]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -347,7 +488,7 @@ export default function Portfolio() {
         observer.observe(element);
       });
     return () => observer.disconnect();
-  }, [status]);
+  }, [status, expanded]);
 
   return (
     <>
@@ -489,7 +630,11 @@ export default function Portfolio() {
                   key={item}
                   aria-pressed={status === item}
                   className={status === item ? "selected" : ""}
-                  onClick={() => setStatus(item)}
+                  onClick={() => {
+                    previousGridHeight.current = null;
+                    setExpanded(false);
+                    setStatus(item);
+                  }}
                 >
                   {item}
                   {item === "All projects" && (
@@ -502,54 +647,76 @@ export default function Portfolio() {
               <Circle size={8} /> 5 released · 2 in development · 3 upcoming
             </span>
           </div>
-          <div className="project-grid" aria-live="polite">
-            {projects
-              .filter(
-                (item) => status === "All projects" || item.status === status,
-              )
-              .map((item) => (
-                <button
-                  key={item.id}
-                  className={`project-card project-${item.accent}`}
-                  onClick={() => setProject(item)}
-                  aria-label={`Explore ${item.name} — ${item.status}`}
-                >
-                  <div className="project-visual">
-                    <div className="project-visual-top">
-                      <span>{item.category}</span>
-                      <span className="project-number">
-                        {String(projects.indexOf(item) + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <div className="preview-stage">
-                      <Preview project={item} />
-                    </div>
-                    <div className="project-visual-bottom">
-                      <span
-                        className={`project-status status-${item.status.toLowerCase().replaceAll(" ", "-")}`}
-                      >
-                        {item.status}
-                      </span>
-                      <span>✦</span>
-                    </div>
+          <div
+            id="project-grid"
+            ref={gridRef}
+            className="project-grid"
+            aria-live="polite"
+          >
+            {visibleProjects.map((item) => (
+              <button
+                key={item.id}
+                className={`project-card project-${item.accent}`}
+                onClick={() => setProject(item)}
+                aria-label={`Explore ${item.name} — ${item.status}`}
+              >
+                <div className="project-visual">
+                  <div className="project-visual-top">
+                    <span>{item.category}</span>
+                    <span className="project-number">
+                      {String(projects.indexOf(item) + 1).padStart(2, "0")}
+                    </span>
                   </div>
-                  <div className="project-info">
-                    <div className="project-title">
-                      <h3>{item.name}</h3>
-                      <span className="project-arrow">
-                        <ArrowUpRight size={19} />
-                      </span>
-                    </div>
-                    <p>{item.description}</p>
-                    <div className="tags">
-                      {item.tags.map((tag) => (
-                        <span key={tag}>{tag}</span>
-                      ))}
-                    </div>
+                  <div className="preview-stage">
+                    <Preview project={item} />
                   </div>
-                </button>
-              ))}
+                </div>
+                <div className="project-info">
+                  <div className="project-meta">
+                    <span
+                      className={`project-status status-${item.status.toLowerCase().replaceAll(" ", "-")}`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+                  <div className="project-title">
+                    <h3>{item.name}</h3>
+                    <span className="project-arrow">
+                      <ArrowUpRight size={19} />
+                    </span>
+                  </div>
+                  <p>{item.description}</p>
+                  <div className="tags">
+                    {item.tags.map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
+          {status === "All projects" && projects.length > 6 && (
+            <div className="project-expand">
+              <button
+                className="button more-projects"
+                aria-controls="project-grid"
+                aria-expanded={expanded}
+                onClick={() => {
+                  previousGridHeight.current =
+                    gridRef.current?.getBoundingClientRect().height ?? null;
+                  setExpanded(!expanded);
+                }}
+              >
+                {expanded ? "Less" : "More"}
+                <span>
+                  {expanded
+                    ? "Show 6 projects"
+                    : `${projects.length - 6} more projects`}
+                </span>
+                <ChevronDown size={16} />
+              </button>
+            </div>
+          )}
           <div className="work-footnote">
             <span className="small-plus">+</span> Always experimenting. Always
             building something new.
@@ -623,38 +790,60 @@ export default function Portfolio() {
             </a>
           </div>
         </section>
-        <section className="approach section-shell">
+        <section
+          id="services"
+          className="approach services section-shell"
+          aria-labelledby="services-heading"
+        >
           <div className="approach-intro">
-            <span className="eyebrow">THE WAY I BUILD</span>
-            <h2>
-              A simple idea.
+            <span className="eyebrow">MY SERVICES</span>
+            <h2 id="services-heading">
+              Digital tools.
               <br />
-              An intentional process.
+              Built for you.
             </h2>
           </div>
-          <div className="process-step">
-            <span>01 / IMAGINE</span>
-            <h3>Start with “what if.”</h3>
+          <div className="process-step service-card">
+            <div className="service-card-top">
+              <span>01 / WEB</span>
+              <Globe2 size={23} strokeWidth={1.4} />
+            </div>
+            <h3>Website Creation</h3>
             <p>
-              Find a real problem. Ask better questions. Make room for a
-              different answer.
+              Portfolios, business websites, and landing pages. Responsive,
+              considered, and built around your goals.
             </p>
+            <a className="text-link" href="#contact">
+              Discuss a website <ArrowUpRight size={14} />
+            </a>
           </div>
-          <div className="process-step">
-            <span>02 / BUILD</span>
-            <h3>Make it tangible.</h3>
+          <div className="process-step service-card">
+            <div className="service-card-top">
+              <span>02 / APPLICATIONS</span>
+              <AppWindow size={23} strokeWidth={1.4} />
+            </div>
+            <h3>Application Development</h3>
             <p>
-              Work with AI, write the code, and turn the first spark into a
-              working experience.
+              Web and Windows applications that turn an idea into a useful tool.
+              Built for the way you work.
             </p>
+            <a className="text-link" href="#contact">
+              Discuss an application <ArrowUpRight size={14} />
+            </a>
           </div>
-          <div className="process-step">
-            <span>03 / REFINE</span>
-            <h3>Care for the details.</h3>
+          <div className="process-step service-card">
+            <div className="service-card-top">
+              <span>03 / AUTOMATION</span>
+              <Workflow size={23} strokeWidth={1.4} />
+            </div>
+            <h3>AI Workflow Automation</h3>
             <p>
-              Try it. Question it. Keep improving until every interaction feels
-              considered.
+              Connect your tools, simplify repetitive tasks, and bring AI into
+              workflows where it can make a practical difference.
             </p>
+            <a className="text-link" href="#contact">
+              Discuss automation <ArrowUpRight size={14} />
+            </a>
           </div>
         </section>
         <section id="contact" className="contact-section section-shell">

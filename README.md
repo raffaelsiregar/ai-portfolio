@@ -15,7 +15,7 @@ Open http://localhost:3000.
 
 Edit `src/lib/portfolio.ts` to update your name, role, email, social links, and project content. Empty social links stay hidden. Adding an email changes the contact form from a local text-file download to a prefilled draft in the visitor's email app. No messages are sent automatically and no visitor data is stored on a server.
 
-The portfolio lists ten real projects: five released, two in development, and three upcoming. Project cards filter by release status. Released projects link to their live URLs; some require sign-in. Upcoming projects deliberately have no fabricated screenshots or demos. Interface copy is in `src/components/portfolio.tsx`; design tokens and responsive styles are in `src/app/globals.css`.
+The portfolio lists ten real projects: five released, two in development, and three upcoming. Project cards filter by release status. All projects initially shows six entries, with an animated More/Less control for the full collection. Status badges sit below screenshots in their own high-contrast row. Released projects link to their live URLs; some require sign-in. Upcoming projects deliberately have no fabricated screenshots or demos. Interface copy is in `src/components/portfolio.tsx`; design tokens and responsive styles are in `src/app/globals.css`.
 
 Images live in `public/projects/`. ezScan and the church site were captured from their local apps. MFD Usage Report and RNS Sales CRM use local sample-data captures. WorshipNow and Stock Research Copilot reuse existing screenshots from their project folders. PraiseNow was captured from its native macOS development build; its target platform is Windows. Each project dialog explains its screenshot source and status. The supplied profile photo is `public/profile.png`.
 
@@ -37,4 +37,6 @@ The site includes project filters, native accessible dialogs with keyboard focus
 
 Sections and project cards reveal once as they enter the viewport. Project dialogs use a scale-and-fade entrance. Both respect reduced-motion preferences. WhatsApp, LinkedIn, and email links appear in the contact section and footer; the contact form opens a draft addressed to the configured email.
 
-The hero sculpture responds to mouse movement with a tilt capped at five degrees and returns to rest on exit. A slow headline highlight and pointer-only accents on headings, cards, buttons, and icons add emphasis. Touch devices avoid hover movement, and reduced-motion preferences disable the added movement.
+The hero sculpture responds to mouse movement with a tilt capped at five degrees. Drag it within the stage using a mouse or touch, or focus it and use arrow keys. The Reset button, Home, and Escape restore its position. A slow headline highlight and pointer-only accents on headings, cards, buttons, and icons add emphasis. Touch devices avoid hover movement, and reduced-motion preferences disable ambient movement while retaining direct drag controls.
+
+The services section presents Website Creation, Application Development, and AI Workflow Automation. The contact headline is bold with a stationary color shimmer; the hero highlight sweeps more slowly on a six-second cycle.
