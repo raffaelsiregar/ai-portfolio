@@ -2552,3 +2552,204 @@ h2 {
     animation: none !important;
   }
 }
+
+/* Keep ambient motion focused on the hero; other accents respond to the visitor. */
+.sculpture-depth {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  transform: perspective(900px) rotateX(var(--pointer-y, 0deg))
+    rotateY(var(--pointer-x, 0deg));
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hero-real {
+  color: transparent;
+  background: linear-gradient(
+    110deg,
+    #b4b3ae 25%,
+    #b4b3ae 42%,
+    #fff0dd 49%,
+    #ffae7c 53%,
+    #b4b3ae 61%,
+    #b4b3ae 80%
+  );
+  background-size: 270% 100%;
+  background-position: 100% 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: idea-highlight 9s ease-in-out infinite;
+}
+@keyframes idea-highlight {
+  0%,
+  62% {
+    background-position: 100% 0;
+  }
+  83%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+.button-primary {
+  position: relative;
+  overflow: hidden;
+}
+.button-primary::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(
+    110deg,
+    transparent 38%,
+    #ffffffa6 50%,
+    transparent 62%
+  );
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+@keyframes button-gleam {
+  to {
+    transform: translateX(110%);
+  }
+}
+.section-title-row h2,
+.about-copy h2,
+.approach-intro h2,
+.contact-section h2,
+.project-title h3,
+.process-step h3 {
+  transition:
+    color 300ms ease,
+    text-shadow 400ms ease;
+}
+.text-link svg,
+.nav-contact svg,
+.button-primary svg,
+.contact-methods a svg,
+.toolkit-items > span,
+.toolkit-items > span > :first-child,
+.about-principles > span,
+.about-principles svg,
+.float-token svg,
+.upcoming-icon,
+.brand span {
+  transition:
+    translate 350ms cubic-bezier(0.16, 1, 0.3, 1),
+    rotate 450ms ease,
+    color 300ms ease,
+    filter 400ms ease;
+}
+.profile-photo {
+  transition: scale 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.project-visual {
+  transition:
+    border-color 350ms ease,
+    box-shadow 450ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .sculpture:hover .torus {
+    filter: drop-shadow(0 0 18px #fa6a1a40) brightness(1.12);
+  }
+  .torus {
+    transition: filter 700ms ease;
+  }
+  .sculpture:hover .float-token svg {
+    rotate: 7deg;
+    color: #ffe0bd;
+  }
+  .sculpture:hover .sculpture-caption {
+    border-color: #b9915c70;
+  }
+  .sculpture-caption {
+    transition: border-color 450ms ease;
+  }
+  .hero-real:hover {
+    filter: drop-shadow(0 0 14px #ff87582b);
+  }
+  .section-title-row h2:hover,
+  .about-copy h2:hover,
+  .approach-intro h2:hover,
+  .contact-section h2:hover {
+    color: #fff5e9;
+    text-shadow: 0 0 26px #ffaf7626;
+  }
+  .project-card:hover .project-title h3 {
+    color: #ffd3b8;
+  }
+  .project-card:hover .project-visual {
+    box-shadow:
+      0 10px 35px #0004,
+      0 0 0 1px #ffffff08;
+  }
+  .project-card:hover .upcoming-icon {
+    translate: 0 -4px;
+    rotate: -5deg;
+    color: #ffe0c6;
+  }
+  .process-step:hover h3 {
+    color: #ffd3b8;
+  }
+  .button-primary:hover::after {
+    animation: button-gleam 750ms ease-out;
+  }
+  .text-link:hover svg,
+  .nav-contact:hover svg,
+  .contact-methods a:hover svg:last-child,
+  .button-primary:hover svg {
+    translate: 2px -2px;
+  }
+  .hero-actions .button-primary:hover svg {
+    translate: 0 3px;
+  }
+  .toolkit-items > span:hover {
+    translate: 0 -3px;
+    color: #f2dfca;
+  }
+  .toolkit-items > span:hover > :first-child {
+    rotate: -6deg;
+  }
+  .about-principles > span:hover {
+    translate: 4px 0;
+    color: #e1d3bf;
+  }
+  .about-principles > span:hover svg {
+    rotate: -8deg;
+    color: #ffb78f;
+  }
+  .about-visual:hover .profile-photo {
+    scale: 1.025;
+  }
+  .brand:hover span {
+    color: #ffc29b;
+    filter: drop-shadow(0 0 7px #ff875880);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sculpture-depth {
+    transform: none;
+  }
+  .hero-real {
+    animation: none;
+    background: none;
+    color: #b4b3ae;
+  }
+  .button-primary::after {
+    display: none;
+  }
+  .toolkit-items > span,
+  .toolkit-items > span > :first-child,
+  .about-principles > span,
+  .about-principles svg,
+  .float-token svg,
+  .upcoming-icon,
+  .text-link svg,
+  .nav-contact svg,
+  .button-primary svg,
+  .contact-methods a svg {
+    translate: none !important;
+    rotate: none !important;
+  }
+  .profile-photo {
+    scale: none !important;
+  }
+}

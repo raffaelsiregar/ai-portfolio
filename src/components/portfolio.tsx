@@ -41,6 +41,25 @@ function Mark({ small = false }: { small?: boolean }) {
 }
 
 function Sculpture() {
+  function followPointer(event: React.PointerEvent<HTMLDivElement>) {
+    if (
+      event.pointerType !== "mouse" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.max(
+      -0.5,
+      Math.min(0.5, (event.clientX - bounds.left) / bounds.width - 0.5),
+    );
+    const y = Math.max(
+      -0.5,
+      Math.min(0.5, (event.clientY - bounds.top) / bounds.height - 0.5),
+    );
+    event.currentTarget.style.setProperty("--pointer-x", `${x * 10}deg`);
+    event.currentTarget.style.setProperty("--pointer-y", `${y * -10}deg`);
+  }
+
   const lines = Array.from({ length: 74 }, (_, index) => {
     const u = (index / 74) * Math.PI * 2;
     const points = Array.from({ length: 65 }, (_, j) => {
@@ -67,43 +86,53 @@ function Sculpture() {
     );
   });
   return (
-    <div className="sculpture" aria-hidden="true">
-      <div className="sculpture-glow" />
-      <div className="orbital orbit-one" />
-      <div className="orbital orbit-two" />
-      <svg className="torus" viewBox="0 0 500 500">
-        <defs>
-          <linearGradient id="copper" x1="0" y1="0" x2="1" y2="1">
-            <stop stopColor="#fff0c5" />
-            <stop offset=".25" stopColor="#ffb36c" />
-            <stop offset=".55" stopColor="#ff783f" />
-            <stop offset="1" stopColor="#86301a" />
-          </linearGradient>
-          <filter id="bloom">
-            <feGaussianBlur stdDeviation="5" />
-          </filter>
-        </defs>
-        <g className="torus-mesh">
-          <g className="torus-bloom" filter="url(#bloom)">
-            {lines}
+    <div
+      className="sculpture"
+      aria-hidden="true"
+      onPointerMove={followPointer}
+      onPointerLeave={(event) => {
+        event.currentTarget.style.setProperty("--pointer-x", "0deg");
+        event.currentTarget.style.setProperty("--pointer-y", "0deg");
+      }}
+    >
+      <div className="sculpture-depth">
+        <div className="sculpture-glow" />
+        <div className="orbital orbit-one" />
+        <div className="orbital orbit-two" />
+        <svg className="torus" viewBox="0 0 500 500">
+          <defs>
+            <linearGradient id="copper" x1="0" y1="0" x2="1" y2="1">
+              <stop stopColor="#fff0c5" />
+              <stop offset=".25" stopColor="#ffb36c" />
+              <stop offset=".55" stopColor="#ff783f" />
+              <stop offset="1" stopColor="#86301a" />
+            </linearGradient>
+            <filter id="bloom">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
+          </defs>
+          <g className="torus-mesh">
+            <g className="torus-bloom" filter="url(#bloom)">
+              {lines}
+            </g>
+            <g>{lines}</g>
           </g>
-          <g>{lines}</g>
-        </g>
-      </svg>
-      <div className="float-token token-code">
-        <Code2 size={25} strokeWidth={1.5} />
+        </svg>
+        <div className="float-token token-code">
+          <Code2 size={25} strokeWidth={1.5} />
+        </div>
+        <div className="float-token token-layers">
+          <Layers3 size={25} strokeWidth={1.5} />
+        </div>
+        <div className="sculpture-caption">
+          <span className="tiny-star">✦</span> A little code. A lot of
+          possibility.
+        </div>
+        <span className="coordinate coordinate-one">IDEA_001</span>
+        <span className="coordinate coordinate-two">∞ POSSIBILITIES</span>
+        <span className="spark spark-one" />
+        <span className="spark spark-two" />
       </div>
-      <div className="float-token token-layers">
-        <Layers3 size={25} strokeWidth={1.5} />
-      </div>
-      <div className="sculpture-caption">
-        <span className="tiny-star">✦</span> A little code. A lot of
-        possibility.
-      </div>
-      <span className="coordinate coordinate-one">IDEA_001</span>
-      <span className="coordinate coordinate-two">∞ POSSIBILITIES</span>
-      <span className="spark spark-one" />
-      <span className="spark spark-two" />
     </div>
   );
 }

@@ -36,3 +36,5 @@ npm run format
 The site includes project filters, native accessible dialogs with keyboard focus management, reduced-motion support, responsive layouts, metadata, and an SVG favicon.
 
 Sections and project cards reveal once as they enter the viewport. Project dialogs use a scale-and-fade entrance. Both respect reduced-motion preferences. WhatsApp, LinkedIn, and email links appear in the contact section and footer; the contact form opens a draft addressed to the configured email.
+
+The hero sculpture responds to mouse movement with a tilt capped at five degrees and returns to rest on exit. A slow headline highlight and pointer-only accents on headings, cards, buttons, and icons add emphasis. Touch devices avoid hover movement, and reduced-motion preferences disable the added movement.
