@@ -174,6 +174,26 @@ export const projects: Project[] = [
       "Captured from the native macOS development build. The intended release platform is Windows; this project is still in development.",
   },
   {
+    id: "agclub",
+    name: "AGClub",
+    category: "Web apps",
+    status: "In development",
+    accent: "orange",
+    description:
+      "Work together. Play together. A sports booking app for the Astragraphia community.",
+    detail:
+      "An in-development progressive web app for Astragraphia employees to discover sports sessions, book slots, and manage waitlists. Dedicated employee, PIC, and admin views bring bookings, attendance, and session management into one place.",
+    tags: ["Next.js", "Supabase", "PWA"],
+    features: [
+      "Sports session discovery, slot booking, and FIFO waitlists",
+      "Employee schedules, calendar downloads, and notification preferences",
+      "PIC and admin tools for sessions, participants, and attendance",
+    ],
+    image: "/projects/agclub.png",
+    captureNote:
+      "Existing local development capture of the sign-in screen and sample demo accounts. This project is still in development.",
+  },
+  {
     id: "easyquot",
     name: "easyQuot",
     category: "AI automation",

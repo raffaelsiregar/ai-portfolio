@@ -669,7 +669,14 @@ export default function Portfolio() {
               ))}
             </div>
             <span className="concept-note">
-              <Circle size={8} /> 5 released · 2 in development · 3 upcoming
+              <Circle size={8} />{" "}
+              {statuses
+                .slice(1)
+                .map(
+                  (item) =>
+                    `${projects.filter((project) => project.status === item).length} ${item.toLowerCase()}`,
+                )
+                .join(" · ")}
             </span>
           </div>
           <div
