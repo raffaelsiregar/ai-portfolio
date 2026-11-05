@@ -2341,6 +2341,13 @@ h2 {
   object-fit: contain;
   box-shadow: none;
 }
+.project-screenshot.preview-artifact {
+  object-fit: contain;
+  background: #0e1012;
+}
+.full-screenshot.preview-artifact {
+  aspect-ratio: 1.6;
+}
 .project-live-link {
   margin-top: 22px;
 }

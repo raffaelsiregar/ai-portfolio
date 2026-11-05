@@ -24,6 +24,8 @@ export type Project = {
   features: string[];
   accent: "orange" | "purple" | "blue";
   image?: string;
+  imageAlt?: string;
+  imageFit?: "contain";
   captureNote?: string;
   url?: string;
 };
@@ -192,6 +194,52 @@ export const projects: Project[] = [
     image: "/projects/agclub.png",
     captureNote:
       "Existing local development capture of the sign-in screen and sample demo accounts. This project is still in development.",
+  },
+  {
+    id: "ai-video-editor",
+    name: "aiVideoEditor",
+    category: "AI automation",
+    status: "In development",
+    accent: "purple",
+    description:
+      "From talking head to finished story. A personal video-editing workflow for TikTok, with captions and motion graphics.",
+    detail:
+      "An AI-assisted editing workflow built around Remotion, React, and TypeScript. It combines storyboards, word-timed captions, person cutouts, floating cards, and glass-style labels into vertical videos for my own content. The workflow is still evolving and runs locally.",
+    tags: ["Remotion", "React", "TypeScript"],
+    features: [
+      "Word-timed captions and animated typography",
+      "Person cutouts, floating cards, and glass-style labels",
+      "Reusable compositions for 1080 × 1920 videos at 30 fps",
+    ],
+    image: "/projects/ai-video-editor.png",
+    imageAlt:
+      "aiVideoEditor — rendered vertical video with layered typography and timed captions",
+    imageFit: "contain",
+    captureNote:
+      "A frame from an existing local video render, showing the editing workflow's output. This is a video example, not an editor screenshot.",
+  },
+  {
+    id: "ai-clipper",
+    name: "aiClipper",
+    category: "AI automation",
+    status: "In development",
+    accent: "blue",
+    description:
+      "Long conversations. Short-form stories. A local podcast clipping studio with AI highlight discovery and editorial approval.",
+    detail:
+      "A local podcast clipping app that takes a source video through transcription, AI highlight discovery, clip review, vertical rendering, and delivery. Campaign rules and human approval guide each clip; a live Remotion editor customizes hooks, captions, and framing. Development and validation are ongoing.",
+    tags: ["Python", "FastAPI", "Remotion", "FFmpeg"],
+    features: [
+      "Campaign-guided highlight discovery with human approval",
+      "Live hook and caption styling with local speaker tracking",
+      "Vertical MP4 rendering, delivery ZIPs, and Excel content planners",
+    ],
+    image: "/projects/ai-clipper.png",
+    imageAlt:
+      "aiClipper — built-in Studio hook template with the sample headline Small idea. Bigger impact.",
+    imageFit: "contain",
+    captureNote:
+      "Built-in Studio hook artwork from the local project. This is an example of a clip's title treatment, not an application screenshot.",
   },
   {
     id: "easyquot",

@@ -281,9 +281,9 @@ function Preview({
   if (project.image) {
     return (
       <img
-        className={`project-screenshot ${detail ? "full-screenshot" : ""}`}
+        className={`project-screenshot ${detail ? "full-screenshot" : ""} ${project.imageFit === "contain" ? "preview-artifact" : ""}`}
         src={project.image}
-        alt={`${project.name} — actual project interface`}
+        alt={project.imageAlt ?? `${project.name} — actual project interface`}
         width={1280}
         height={800}
         loading="lazy"
