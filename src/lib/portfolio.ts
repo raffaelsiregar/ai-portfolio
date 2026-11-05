@@ -11,7 +11,8 @@ export const profile = {
   tagline: "Turning curiosity into things you can actually use.",
 };
 
-export type Status = "Released" | "In development" | "Upcoming";
+export type Status =
+  "Released" | "Private Released" | "In development" | "Upcoming";
 export type Category = "AI automation" | "Web apps" | "Windows apps";
 export type Project = {
   id: string;
@@ -24,6 +25,7 @@ export type Project = {
   features: string[];
   accent: "orange" | "purple" | "blue";
   image?: string;
+  video?: string;
   imageAlt?: string;
   imageFit?: "contain";
   captureNote?: string;
@@ -197,14 +199,14 @@ export const projects: Project[] = [
   },
   {
     id: "ai-video-editor",
-    name: "aiVideoEditor",
+    name: "AI Assisted Video Editing",
     category: "AI automation",
-    status: "In development",
+    status: "Private Released",
     accent: "purple",
     description:
       "From talking head to finished story. A personal video-editing workflow for TikTok, with captions and motion graphics.",
     detail:
-      "An AI-assisted editing workflow built around Remotion, React, and TypeScript. It combines storyboards, word-timed captions, person cutouts, floating cards, and glass-style labels into vertical videos for my own content. The workflow is still evolving and runs locally.",
+      "An AI-assisted editing workflow built around Remotion, React, and TypeScript. It combines storyboards, word-timed captions, person cutouts, floating cards, and glass-style labels into vertical videos for my own content. Privately released for my own content creation and run locally.",
     tags: ["Remotion", "React", "TypeScript"],
     features: [
       "Word-timed captions and animated typography",
@@ -212,22 +214,23 @@ export const projects: Project[] = [
       "Reusable compositions for 1080 × 1920 videos at 30 fps",
     ],
     image: "/projects/ai-video-editor.png",
+    video: "/projects/ai-assisted-video-editing.mp4",
     imageAlt:
-      "aiVideoEditor — rendered vertical video with layered typography and timed captions",
+      "AI Assisted Video Editing — three-second example with layered typography and timed captions",
     imageFit: "contain",
     captureNote:
-      "A frame from an existing local video render, showing the editing workflow's output. This is a video example, not an editor screenshot.",
+      "A muted, three-second excerpt from an existing local video render. The preview loops to show captions and motion graphics in action.",
   },
   {
     id: "ai-clipper",
-    name: "aiClipper",
+    name: "AI Clipper Smart Tools",
     category: "AI automation",
-    status: "In development",
+    status: "Private Released",
     accent: "blue",
     description:
       "Long conversations. Short-form stories. A local podcast clipping studio with AI highlight discovery and editorial approval.",
     detail:
-      "A local podcast clipping app that takes a source video through transcription, AI highlight discovery, clip review, vertical rendering, and delivery. Campaign rules and human approval guide each clip; a live Remotion editor customizes hooks, captions, and framing. Development and validation are ongoing.",
+      "A local podcast clipping app that takes a source video through transcription, AI highlight discovery, clip review, vertical rendering, and delivery. Campaign rules and human approval guide each clip; a live Remotion editor customizes hooks, captions, and framing. Privately released as a local studio, with no public demo.",
     tags: ["Python", "FastAPI", "Remotion", "FFmpeg"],
     features: [
       "Campaign-guided highlight discovery with human approval",
@@ -236,10 +239,10 @@ export const projects: Project[] = [
     ],
     image: "/projects/ai-clipper.png",
     imageAlt:
-      "aiClipper — built-in Studio hook template with the sample headline Small idea. Bigger impact.",
+      "AI Clipper Smart Tools — local studio sign-in screen with a green waveform and cream login panel",
     imageFit: "contain",
     captureNote:
-      "Built-in Studio hook artwork from the local project. This is an example of a clip's title treatment, not an application screenshot.",
+      "User-provided screenshot of the local studio's sign-in screen. Privately released; no public access link is available.",
   },
   {
     id: "easyquot",

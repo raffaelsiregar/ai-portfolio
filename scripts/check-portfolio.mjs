@@ -11,7 +11,8 @@ const { projects, profile } = await import(
 
 const expected = {
   Released: ["ezscan", "worshipnow", "gbi-bkp-bcp", "mfd-usage-report", "rns-salescrm"],
-  "In development": ["stock-research-copilot", "praisenow", "agclub", "ai-video-editor", "ai-clipper"],
+  "Private Released": ["ai-video-editor", "ai-clipper"],
+  "In development": ["stock-research-copilot", "praisenow", "agclub"],
   Upcoming: ["easyquot", "onlinepo", "pocketrav"],
 };
 assert.equal(projects.length, 13);
@@ -22,6 +23,7 @@ for (const [status, ids] of Object.entries(expected)) {
 for (const project of projects) {
   if (project.status !== "Upcoming") {
     assert.ok(project.image && existsSync(`public${project.image}`), `${project.name}: preview missing`);
+    if (project.video) assert.ok(existsSync(`public${project.video}`), `${project.name}: video missing`);
     assert.ok(project.captureNote, `${project.name}: preview context missing`);
   }
   assert.equal(Boolean(project.url), project.status === "Released", `${project.name}: release link does not match status`);
@@ -29,12 +31,16 @@ for (const project of projects) {
 }
 for (const id of ["ai-video-editor", "ai-clipper"]) {
   const project = projects.find((item) => item.id === id);
-  assert.equal(project.status, "In development");
+  assert.equal(project.status, "Private Released");
   assert.ok(project.imageAlt, `${project.name}: output preview needs descriptive alt text`);
   assert.equal(project.imageFit, "contain", `${project.name}: preview should stay uncropped`);
 }
+const editor = projects.find((item) => item.id === "ai-video-editor");
+assert.equal(editor.name, "AI Assisted Video Editing");
+assert.equal(editor.video, "/projects/ai-assisted-video-editing.mp4");
+assert.equal(projects.find((item) => item.id === "ai-clipper").name, "AI Clipper Smart Tools");
 assert.ok(existsSync(`public${profile.photo}`));
 assert.equal(profile.email, "raffaelnathanielsiregar@gmail.com");
 assert.equal(profile.whatsapp, "https://wa.me/6287884440256");
 assert.equal(profile.linkedin, "https://www.linkedin.com/in/raffaelnathanielsiregar/");
-console.log("Portfolio verified: 13 projects, 5 released, 5 in development, 3 upcoming, 10 local project previews, and profile photo.");
+console.log("Portfolio verified: 13 projects, 5 released, 2 privately released, 3 in development, 3 upcoming, 10 local project previews including one video, and profile photo.");

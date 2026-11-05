@@ -32,6 +32,7 @@ import {
 const statuses: ("All projects" | Status)[] = [
   "All projects",
   "Released",
+  "Private Released",
   "In development",
   "Upcoming",
 ];
@@ -271,6 +272,66 @@ function Sculpture() {
   );
 }
 
+function VideoPreview({
+  project,
+  detail,
+}: {
+  project: Project;
+  detail: boolean;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+
+    function syncPlayback() {
+      if (!visible || document.hidden || motion.matches) {
+        video!.pause();
+      } else {
+        void video!.play().catch(() => {
+          // A blocked autoplay leaves the poster visible; the dialog has controls.
+        });
+      }
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        syncPlayback();
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(video);
+    motion.addEventListener("change", syncPlayback);
+    document.addEventListener("visibilitychange", syncPlayback);
+    return () => {
+      observer.disconnect();
+      motion.removeEventListener("change", syncPlayback);
+      document.removeEventListener("visibilitychange", syncPlayback);
+      video.pause();
+    };
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      className={`project-screenshot preview-artifact project-video ${detail ? "full-screenshot" : ""}`}
+      src={project.video}
+      poster={project.image}
+      width={540}
+      height={960}
+      muted
+      loop
+      playsInline
+      controls={detail}
+      preload="metadata"
+      aria-label={project.imageAlt}
+    />
+  );
+}
+
 function Preview({
   project,
   detail = false,
@@ -278,6 +339,7 @@ function Preview({
   project: Project;
   detail?: boolean;
 }) {
+  if (project.video) return <VideoPreview project={project} detail={detail} />;
   if (project.image) {
     return (
       <img
@@ -1028,9 +1090,11 @@ export default function Portfolio() {
             </div>
             {project.status !== "Released" && (
               <p className="concept-disclaimer">
-                {project.status === "In development"
-                  ? "Still in development. Features and interface may change before release."
-                  : "Upcoming project. No released app or working demo yet."}
+                {project.status === "Private Released"
+                  ? "Privately released. This project is used locally and has no public demo."
+                  : project.status === "In development"
+                    ? "Still in development. Features and interface may change before release."
+                    : "Upcoming project. No released app or working demo yet."}
               </p>
             )}
           </div>

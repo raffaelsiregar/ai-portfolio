@@ -621,12 +621,15 @@ h2 {
 }
 .work-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin: 32px 0 25px;
 }
 .filter-list {
   display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   gap: 4px;
   padding: 4px;
   border: 1px solid #ffffff0b;
@@ -2271,6 +2274,9 @@ h2 {
 .status-released {
   color: #a8c698;
 }
+.status-private-released {
+  color: #9ed9d6;
+}
 .status-in-development {
   color: #e4b574;
 }
@@ -2347,6 +2353,9 @@ h2 {
 }
 .full-screenshot.preview-artifact {
   aspect-ratio: 1.6;
+}
+.project-card .project-video {
+  pointer-events: none;
 }
 .project-live-link {
   margin-top: 22px;
@@ -2804,6 +2813,11 @@ h2 {
   color: #c2e5b6;
   background: #213027;
   border-color: #456146;
+}
+.project-meta .status-private-released {
+  color: #bdece6;
+  background: #1c3432;
+  border-color: #427b73;
 }
 .project-meta .status-in-development {
   color: #ffdaa0;
